@@ -31,12 +31,6 @@
         let
           pkgs = nixpkgsFor.${system};
           pname = "tsui";
-
-          linuxInterpreters = {
-            x86_64 = "/lib64/ld-linux-x86-64.so.2"; 
-            aarch64 = "/lib/ld-linux-aarch64.so.1";
-          };
-          linuxInterpreter = linuxInterpreters.${pkgs.stdenv.hostPlatform.parsed.cpu.name};
         in
         {
           tsui = pkgs.buildGoModule {
@@ -65,11 +59,6 @@
             vendorHash = "sha256-FIbkPE5KQ4w7Tc7kISQ7ZYFZAoMNGiVlFWzt8BPCf+A=";
 
             buildInputs = dependenciesFor pkgs;
-
-            # Un-Nix the build so it can dlopen() X11 outside of Nix environments.
-            preFixup = if pkgs.stdenv.isLinux then ''
-              patchelf --remove-rpath --set-interpreter ${linuxInterpreter} $out/bin/${pname}
-            '' else null;
           };
         });
 
